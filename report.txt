@@ -1,0 +1,70 @@
+Vault state report — INCOMPLETE
+Asset amounts are tokens; shares are raw units.
+Holder values are proportional ownership, not immediately withdrawable balances.
+An unset strategy cap has an effective value of zero.
+
+Vault: vault-core
+  Asset decimals: 6
+  Total assets: 184000 tokens
+  Idle assets: 54000 tokens
+  Shares outstanding (raw units): 179307410316
+  Strategies:
+    aave: 130000 tokens; effective cap: 200000 tokens
+    spark: 0 tokens; effective cap: 30000 tokens
+  Holders (calculated asset values, rounded down):
+    alice: 100000000000 shares (raw units); calculated value: 102617.063999 tokens
+    bob: 30047132757 shares (raw units); calculated value: 30833.485451 tokens
+    grace: 49260277559 shares (raw units); calculated value: 50549.450549 tokens
+  Valuation rounding remainder: 0.000001 tokens (1 smallest asset units)
+
+Vault: vault-yield
+  Asset decimals: 6
+  Total assets: 403000 tokens
+  Idle assets: 83000 tokens
+  Shares outstanding (raw units): 399009900990
+  Strategies:
+    aave: 80000 tokens; effective cap: 500000 tokens
+    morpho: 240000 tokens; effective cap: 200000 tokens; ABOVE CAP by 40000 tokens
+  Holders (calculated asset values, rounded down):
+    alice: 300000000000 shares (raw units); calculated value: 303000 tokens
+    erin: 99009900990 shares (raw units); calculated value: 99999.999999 tokens
+  Valuation rounding remainder: 0.000001 tokens (1 smallest asset units)
+
+Excluded vaults — incomplete or invalid history:
+  Excluded vault vault-legacy (see stderr logs for details)
+
+Proposed fund movements (not executed)
+
+Vault: vault-core
+  Total assets: 184000 tokens
+  Allocation targets (token amounts):
+    aave: current 130000; policy 60% = 110400; cap 200000; feasible target 110400
+    spark: current 0; policy 25% = 46000; cap 30000; feasible target 30000
+  Proposed moves:
+  1. Move 19600 tokens from aave to idle.
+  2. Move 30000 tokens from idle to spark.
+  Projected end state (if all moves are applied):
+    Total assets: 184000 tokens
+    Idle assets: 43600 tokens
+    aave: projected 110400; policy 60% = 110400; cap 200000; feasible target 110400
+    spark: projected 30000; policy 25% = 46000; cap 30000; feasible target 30000
+    Shares and holder ownership unchanged.
+    UNMET: 16000 tokens for spark blocked by effective cap; funds remain idle.
+
+Vault: vault-yield
+  Total assets: 403000 tokens
+  Allocation targets (token amounts):
+    aave: current 80000; policy 50% = 201500; cap 500000; feasible target 201500
+    ether-fi: current 0; policy 10% = 40300; cap 0; feasible target 0
+    morpho: current 240000; policy 40% = 161200; cap 200000; feasible target 161200
+  Proposed moves:
+  1. Move 78800 tokens from morpho to idle.
+  2. Move 121500 tokens from idle to aave.
+  Projected end state (if all moves are applied):
+    Total assets: 403000 tokens
+    Idle assets: 40300 tokens
+    aave: projected 201500; policy 50% = 201500; cap 500000; feasible target 201500
+    ether-fi: projected 0; policy 10% = 40300; cap 0; feasible target 0
+    morpho: projected 161200; policy 40% = 161200; cap 200000; feasible target 161200
+    Shares and holder ownership unchanged.
+    UNMET: 40300 tokens for ether-fi blocked by effective cap; funds remain idle.
