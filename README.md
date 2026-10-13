@@ -1,25 +1,31 @@
-# Curator vault manager — second attempt
+# Curator vault manager
 
 This version starts with one job: read the supplied event feed, determine which
 events still count, and reconstruct a readable report of each vault's funds.
 A vault pools deposits; shares represent ownership of the pool. Strategies hold
 some of its assets, and the rest is idle. Earnings increase assets, not shares.
 It also reads the curator policy and proposes safe fund movements. No transfers
-are executed. The printed state and plan match the first-attempt format.
+are executed.
 
 ## Run
 
-From this worktree directory:
+Requires a current stable Rust toolchain with Cargo. Run commands from the repository root, which contains `Cargo.toml`. The application reads `data/events.jsonl` and `data/policy.json` relative to the working directory. No credentials, live blockchain connection, or additional configuration are required. Cargo downloads dependencies on the first build.
 
 ```sh
 cargo run
-cargo test
-cargo clippy --all-targets -- -D warnings
 ```
 
-The supplied feed references `vault-legacy` without creating it. The program
-prints the two valid vaults, identifies the excluded vault, and exits with status
-1 to signal incomplete history. This is expected fixture behavior, not a crash.
+The supplied feed references `vault-legacy` without creating it. The program prints the two valid vaults and their plans, identifies the excluded vault, and exits with status **1** to signal incomplete history. This is expected fixture behavior, not a crash.
+
+## Verify
+
+```sh
+cargo test
+cargo clippy --all-targets -- -D warnings
+cargo fmt --check
+```
+
+See [NOTES.md](NOTES.md) for limitations and the proposed live-service design.
 
 ## Programme flow
 
@@ -102,9 +108,11 @@ There is no queue framework, generic processing pipeline, or live chain client.
 Structured `tracing` events go to stderr; the report goes to stdout.
 
 ```sh
-# Send report and logging output to separate files
+# Show detailed logs
 RUST_LOG=debug cargo run
-LOG_FORMAT=json RUST_LOG=info cargo run > /tmp/report.txt 2> /tmp/events.log
+
+# Send the report and JSON logs to separate files
+LOG_FORMAT=json RUST_LOG=info cargo run --quiet > /tmp/report.txt 2> /tmp/events.log
 ```
 
 INFO logs accepted replay events with vault, block, log index, line, event data,
@@ -124,7 +132,7 @@ transaction records. Errors are logged once at the CLI boundary.
 - Amounts are `u64` smallest asset units; overflow and insufficient balances
   return `AccountingError` variants. Input share amounts are used as supplied.
 - Caps are reconstructed, not enforced during replay. Existing over-cap balances
-  must be visible for a future planner. Missing caps have effective value zero.
+  must be visible for the planner. Missing caps have effective value zero.
 - Holder value is `assets * holder shares / total shares`, with a `u128`
   intermediate. Integer division rounds down to the smallest asset unit. The
   difference from summed rounded values is reported, not treated as lost funds.
